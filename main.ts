@@ -1,14 +1,14 @@
 import "jsr:@std/dotenv/load";
-import schedule from 'node-schedule';
-import { type Context, Telegraf, session } from 'telegraf';
-import { FmtString } from 'telegraf/format';
+import schedule from "node-schedule";
+import { type Context, session, Telegraf } from "telegraf";
+import { FmtString } from "telegraf/format";
 
-console.log('Bot is working...');
+console.log("Bot is working...");
 
-const TOKEN = Deno.env.get('TELEGRAM_BOT_TOKEN');
+const TOKEN = Deno.env.get("TELEGRAM_BOT_TOKEN");
 
 if (TOKEN == null) {
-  throw new TypeError('TELEGRAM_BOT_TOKEN must be provided!');
+  throw new TypeError("TELEGRAM_BOT_TOKEN must be provided!");
 }
 
 interface SessionData {
@@ -28,16 +28,16 @@ const bot = new Telegraf<LocalContext>(TOKEN);
 bot.use(session());
 
 const CALLBACK_DATA_IDS = {
-  TaskAlreadyDone: 'done-button-clicked',
+  TaskAlreadyDone: "done-button-clicked",
 } as const;
 
-const text = '⚠️ Пора сдать показания счетчиков!';
+const text = "⚠️ Пора сдать показания счетчиков!";
 const startText =
-  'Привет! Каждый день начиная с 15 числа месяца и в течении 10 дней, я буду напоминать тебе о том, что нужно сдать показания счетчиков';
-const textAlt = '⚠️ Счетчики ждут!';
-const siteText = 'Сайт Личного Кабинета';
-const doneText = '✅ Уже сдал(а)';
-const websiteUrl = 'https://cabinet.rc-online.ru/sign_in';
+  "Привет! Каждый день начиная с 15 числа месяца и в течении 10 дней, я буду напоминать тебе о том, что нужно сдать показания счетчиков";
+const textAlt = "⚠️ Счетчики ждут!";
+const siteText = "Сайт Личного Кабинета";
+const doneText = "✅ Уже сдал(а)";
+const websiteUrl = "https://cabinet.rc-online.ru/sign_in";
 let remindersEnabled = true;
 let taskDoneThisMonth = false;
 
@@ -61,7 +61,7 @@ const resetMonthlyTask = () => {
 };
 
 // Schedule the taskDoneThisMonth reset to run daily at midnight
-schedule.scheduleJob('0 0 * * *', () => {
+schedule.scheduleJob("0 0 * * *", () => {
   resetMonthlyTask();
 });
 
@@ -83,9 +83,9 @@ const doneCommand = (ctx: { reply: (text: string) => void }) => {
   if (!taskDoneThisMonth) {
     taskDoneThisMonth = true;
     remindersEnabled = false;
-    ctx.reply('✅ Отлично! Увидимся в следующем месяце!');
+    ctx.reply("✅ Отлично! Увидимся в следующем месяце!");
   } else {
-    ctx.reply('✅ Показания счетчиков уже сданы. Успокойся!');
+    ctx.reply("✅ Показания счетчиков уже сданы. Успокойся!");
   }
 };
 const undoneCommand = (ctx: { reply: (text: string) => void }) => {
@@ -121,18 +121,18 @@ bot.start((ctx) => {
   ctx.reply(startText);
 });
 // Command to get the current status of the task
-bot.command('status', (ctx) => {
+bot.command("status", (ctx) => {
   const statusMessage = taskDoneThisMonth
-    ? '✅ Показания счетчиков на этот месяц уже сданы.'
+    ? "✅ Показания счетчиков на этот месяц уже сданы."
     : textAlt;
 
   ctx.reply(statusMessage);
 });
 
-bot.command('done', doneCommand);
-bot.command('undone', undoneCommand);
+bot.command("done", doneCommand);
+bot.command("undone", undoneCommand);
 
-bot.on('callback_query', (ctx) => {
+bot.on("callback_query", (ctx) => {
   switch (ctx.callbackQuery.data) {
     case CALLBACK_DATA_IDS.TaskAlreadyDone: {
       doneCommand(ctx);
@@ -141,7 +141,7 @@ bot.on('callback_query', (ctx) => {
     }
 
     default: {
-      console.log('Unknown callback query');
+      console.log("Unknown callback query");
     }
   }
 });
